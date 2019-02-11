@@ -77,26 +77,29 @@ public class WebLogSessionization {
         String nextHitUrl = nextHit._3().get(0);
         long nextHitTime = nextHit._1().getTime();
 
+        int index = 0;
+        List<Tuple3<Date, Date, List<String>>> sessionList = new ArrayList<>(a);
         for (Tuple3<Date, Date, List<String>> prevHit : a) {
             long startTime = prevHit._1().getTime();
             long endTime = prevHit._2().getTime();
 
-            ArrayList<Tuple3<Date, Date, List<String>>> sessionList = new ArrayList<>();
+//            ArrayList<Tuple3<Date, Date, List<String>>> sessionList = new ArrayList<>();
             ArrayList<String> urlList = new ArrayList<>( prevHit._3());
             if (!urlList.contains(nextHitUrl)) {
                 urlList.add(nextHitUrl);
             }
 
             if (nextHitTime > endTime && (nextHitTime - endTime < timeout)) {
-                sessionList.add(new Tuple3<>(new Date(startTime), new Date(nextHitTime), urlList));
+                sessionList.set(index,new Tuple3<>(new Date(startTime), new Date(nextHitTime), urlList));
                 return sessionList;
             } else if (nextHitTime < startTime && (startTime - nextHitTime < timeout)) {
-                sessionList.add(new Tuple3<>(new Date(nextHitTime), new Date(endTime), urlList));
+                sessionList.set(index,new Tuple3<>(new Date(nextHitTime), new Date(endTime), urlList));
                 return sessionList;
             } else if (nextHitTime >= startTime && nextHitTime <= endTime) {
-                sessionList.add(new Tuple3<>(new Date(startTime), new Date(endTime), urlList));
+                sessionList.set(index,new Tuple3<>(new Date(startTime), new Date(endTime), urlList));
                 return sessionList;
             }
+            index++;
         }
 
         a.add(nextHit);
